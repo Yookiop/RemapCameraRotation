@@ -20,8 +20,8 @@ public interface RemapCameraConfig extends Config
 	@ConfigItem(
 		position = 1,
 		keyName = "cameraRotateRemap",
-		name = "Remap Camera Rotate",
-		description = "When enabled, holding the Camera Rotate Key simulates middle mouse button to rotate the camera.",
+		name = "Remap camera rotating key",
+		description = "When enabled, holding the camera rotating key simulates the middle mouse button to rotate the camera when moving the mouse.",
 		section = cameraSection
 	)
 	default boolean cameraRotateRemap()
@@ -32,7 +32,7 @@ public interface RemapCameraConfig extends Config
 	@ConfigItem(
 		position = 2,
 		keyName = "cameraRotateKey",
-		name = "Camera Rotate Key",
+		name = "Camera rotating key",
 		description = "Hold this key while moving the mouse to rotate the camera (simulates middle mouse button / scroll wheel click).",
 		section = cameraSection
 	)

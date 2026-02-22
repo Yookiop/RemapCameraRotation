@@ -8,7 +8,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 @PluginDescriptor(
-	name = "Remap camera rotation",
+	name = "Remap Camera Rotation",
 	description = "Simulates middle mouse button for camera rotation using a configurable key",
 	tags = {"camera", "rotate", "middle mouse"}
 )
