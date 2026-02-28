@@ -1,24 +1,25 @@
 package com.remapcamera;
 
-import java.awt.Canvas;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
-import javax.swing.SwingUtilities;
-import net.runelite.api.Client;
 import net.runelite.client.input.KeyListener;
+import net.runelite.client.input.MouseListener;
 
-public class RemapCameraListener implements KeyListener
+public class RemapCameraListener implements KeyListener, MouseListener
 {
 	@Inject
 	private RemapCameraConfig config;
 
-	@Inject
-	private Client client;
-
 	private boolean cameraRotateKeyPressed = false;
+	private int lastMouseX = -1;
+	private int lastMouseY = -1;
+
+	// Accumulated yaw/pitch delta (sensitivity pre-multiplied), drained on the client
+	// thread in RemapCameraPlugin#onClientTick to avoid mutating game state from the AWT thread.
+	final AtomicInteger pendingDx = new AtomicInteger();
+	final AtomicInteger pendingDy = new AtomicInteger();
 
 	@Override
 	public void keyTyped(KeyEvent e)
@@ -30,11 +31,7 @@ public class RemapCameraListener implements KeyListener
 	{
 		if (config.cameraRotateRemap() && config.cameraRotateKey().matches(e))
 		{
-			if (!cameraRotateKeyPressed)
-			{
-				cameraRotateKeyPressed = true;
-				injectMouseButton(MouseEvent.MOUSE_PRESSED, MouseEvent.BUTTON2);
-			}
+			cameraRotateKeyPressed = true;
 			e.consume();
 		}
 	}
@@ -45,31 +42,81 @@ public class RemapCameraListener implements KeyListener
 		if (config.cameraRotateRemap() && cameraRotateKeyPressed && config.cameraRotateKey().matches(e))
 		{
 			cameraRotateKeyPressed = false;
-			injectMouseButton(MouseEvent.MOUSE_RELEASED, MouseEvent.BUTTON2);
+			lastMouseX = -1;
+			lastMouseY = -1;
 			e.consume();
 		}
 	}
 
-	private void injectMouseButton(int eventType, int button)
+	@Override
+	public MouseEvent mouseClicked(MouseEvent e)
 	{
-		Canvas canvas = client.getCanvas();
-		if (canvas == null)
+		return e;
+	}
+
+	@Override
+	public MouseEvent mousePressed(MouseEvent e)
+	{
+		return e;
+	}
+
+	@Override
+	public MouseEvent mouseReleased(MouseEvent e)
+	{
+		return e;
+	}
+
+	@Override
+	public MouseEvent mouseEntered(MouseEvent e)
+	{
+		return e;
+	}
+
+	@Override
+	public MouseEvent mouseExited(MouseEvent e)
+	{
+		return e;
+	}
+
+	@Override
+	public MouseEvent mouseMoved(MouseEvent e)
+	{
+		if (cameraRotateKeyPressed)
+		{
+			accumulateDelta(e.getX(), e.getY());
+		}
+		lastMouseX = e.getX();
+		lastMouseY = e.getY();
+		return e;
+	}
+
+	@Override
+	public MouseEvent mouseDragged(MouseEvent e)
+	{
+		// Only track position while a mouse button is held; do not accumulate camera delta
+		// here to avoid conflicting with the game's own right-click camera drag.
+		lastMouseX = e.getX();
+		lastMouseY = e.getY();
+		return e;
+	}
+
+	private void accumulateDelta(int x, int y)
+	{
+		if (lastMouseX == -1 || lastMouseY == -1)
 		{
 			return;
 		}
-		Point p = MouseInfo.getPointerInfo().getLocation();
-		SwingUtilities.convertPointFromScreen(p, canvas);
-		MouseEvent mouseEvent = new MouseEvent(
-			canvas,
-			eventType,
-			System.currentTimeMillis(),
-			0,
-			p.x,
-			p.y,
-			1,
-			false,
-			button
-		);
-		canvas.dispatchEvent(mouseEvent);
+
+		int dx = x - lastMouseX;
+		int dy = y - lastMouseY;
+
+		if (dx == 0 && dy == 0)
+		{
+			return;
+		}
+
+		int sensitivity = config.cameraSensitivity();
+		pendingDx.addAndGet(dx * sensitivity);
+		pendingDy.addAndGet(dy * sensitivity);
 	}
 }
