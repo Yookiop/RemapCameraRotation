@@ -17,6 +17,7 @@ def runeLiteVersion = 'latest.release'
 def pluginMainClass = 'com.example.ExamplePluginTest'
 
 dependencies {
+			implementation 'javax.inject:javax.inject:1'
 		// LWJGL core and Windows x64 natives
 		testImplementation "org.lwjgl:lwjgl:3.3.2"
 		testImplementation "org.lwjgl:lwjgl-opengl:3.3.2"
