@@ -41,17 +41,4 @@ public interface RemapCameraConfig extends Config
 	{
 		return new ModifierlessKeybind(KeyEvent.VK_UNDEFINED, 0);
 	}
-
-	@Range(min = 1, max = 10)
-	@ConfigItem(
-		position = 3,
-		keyName = "cameraSensitivity",
-		name = "Camera sensitivity",
-		description = "How many yaw/pitch units to move per pixel of mouse movement (1 = slow, 10 = fast).",
-		section = cameraSection
-	)
-	default int cameraSensitivity()
-	{
-		return 3;
-	}
 }

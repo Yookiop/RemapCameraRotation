@@ -115,8 +115,7 @@ public class RemapCameraListener implements KeyListener, MouseListener
 			return;
 		}
 
-		int sensitivity = config.cameraSensitivity();
-		pendingDx.addAndGet(dx * sensitivity);
-		pendingDy.addAndGet(dy * sensitivity);
+		pendingDx.addAndGet(dx);
+		pendingDy.addAndGet(dy);
 	}
 }
