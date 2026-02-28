@@ -17,6 +17,11 @@ def runeLiteVersion = 'latest.release'
 def pluginMainClass = 'com.example.ExamplePluginTest'
 
 dependencies {
+		// LWJGL core and Windows x64 natives
+		testImplementation "org.lwjgl:lwjgl:3.3.2"
+		testImplementation "org.lwjgl:lwjgl-opengl:3.3.2"
+		testRuntimeOnly "org.lwjgl:lwjgl:3.3.2:natives-windows"
+		testRuntimeOnly "org.lwjgl:lwjgl-opengl:3.3.2:natives-windows"
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
